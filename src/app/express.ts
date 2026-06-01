@@ -5,7 +5,9 @@ import compression from 'compression'
 import cookieParser from 'cookie-parser'
 import { errorHandler } from '../shared/MIDDLEWARE/error-handler'
 import { httpLogger } from '../shared/LOGGER/http'
-import {  notFoundHandler } from '../shared/ERRORS/not-found-error'
+import { notFoundHandler } from '../shared/ERRORS/not-found-error'
+import swaggerUi from 'swagger-ui-express'
+import { swaggerSpec } from '../shared/CONFIG/swagger'
 
 export const app = express()
 
@@ -15,6 +17,8 @@ app.use(httpLogger)
 app.use(compression())
 app.use(cookieParser())
 app.use(express.json())
+
+app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec))
 
 app.get('/health', (_req, res) => {
   return res.status(200).json({

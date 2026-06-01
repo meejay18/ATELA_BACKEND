@@ -1,2 +1,5 @@
 import pinoHttp from 'pino-http'
-export const httpLogger = pinoHttp()
+import { logger } from '.'
+export const httpLogger = pinoHttp({
+  logger,
+})
