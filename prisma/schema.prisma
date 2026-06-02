@@ -1,9 +1,23 @@
 
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
   url = env("DATABASE_URL")
+}
+
+ enum  TenantStatus {
+  ACTIVE
+  SUSPENDED
+  INACTIVE
+ }
+
+enum UserRole {
+  SUPER_ADMIN
+  ADMIN
+  PATTERN_MAKER
+  CUTTER
+  TAILOR
 }
