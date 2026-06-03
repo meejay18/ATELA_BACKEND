@@ -21,3 +21,74 @@ enum UserRole {
   CUTTER
   TAILOR
 }
+
+enum VerificationType {
+  EMAIL_VERIFICATION
+  PASSWORD_RESET
+  TWO_FACTOR
+}
+
+model Tenant {
+  id String @id @default(uuid())
+  name String 
+  teamSize String?
+  slug String @unique
+  isOnboarded Boolean @default(false)
+  status TenantStatus @default(ACTIVE)
+  users User[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model User {
+  id String @id @default(uuid())
+  tenantId String? 
+  tenant Tenant? @relation(fields: [tenantId], references: [id])
+  firstName String
+  lastName String
+  email String @unique
+  password String
+  role UserRole @default(ADMIN)
+  isVerified Boolean @default(false)
+  verifiedAt DateTime?
+  isActive Boolean @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  refreshToken RefreshToken[]
+  verificationCodes verificationCode[]
+
+
+  @@index([tenantId])
+  @@index([email])
+}
+
+model RefreshToken  {
+  id String @id @default(uuid())
+  userId String 
+  user User @relation(fields : [userId], references: [id])
+  token String
+  expiresAt DateTime 
+  revoked Boolean @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+
+model verificationCode {
+  id String @id @default(uuid())
+  userId String
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  code String
+  type VerificationType 
+  expiresAt DateTime
+  usedAt DateTime?
+  revoked Boolean @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([code])
+}
