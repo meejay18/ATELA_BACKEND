@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken'
 import { env } from '../../../shared/CONFIG/env'
-import { JwtPayload } from '../../../shared/TYPES/jwt.payload'
+import { JwtPayload } from '../domain/jwt.payload'
 
 export const tokenService = {
   generateAccessToken: (payload: JwtPayload): string => {

@@ -17,9 +17,11 @@ datasource db {
 enum UserRole {
   SUPER_ADMIN
   ADMIN
+  FLOOR_MANAGER
   PATTERN_MAKER
   CUTTER
   TAILOR
+  FINISHER
 }
 
 enum VerificationType {
@@ -34,6 +36,7 @@ model Tenant {
   teamSize String?
   slug String @unique
   isOnboarded Boolean @default(false)
+  isSuspended Boolean @default(false)
   status TenantStatus @default(ACTIVE)
   users User[]
   createdAt DateTime @default(now())
