@@ -49,4 +49,19 @@ export const responses = {
       },
     },
   },
+
+  ConflictError: {
+    description: 'Conflict - Resource already exists',
+    content: {
+      'application/json': {
+        schema: {
+          $ref: '#/components/schemas/ErrorResponse',
+        },
+        example: {
+          success: false,
+          message: 'An account with this email already exists',
+        },
+      },
+    },
+  },
 }

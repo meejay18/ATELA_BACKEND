@@ -6,6 +6,7 @@ import cookieParser from 'cookie-parser'
 import { errorHandler } from '../shared/MIDDLEWARE/error-handler'
 import { httpLogger } from '../shared/LOGGER/http'
 import { notFoundHandler } from '../shared/ERRORS/not-found-error'
+import { authRoutes } from '../modules/AUTH/routes/auth.routes'
 import swaggerUi from 'swagger-ui-express'
 import { swaggerSpec } from '../shared/CONFIG/swagger'
 
@@ -17,6 +18,8 @@ app.use(httpLogger)
 app.use(compression())
 app.use(cookieParser())
 app.use(express.json())
+
+app.use('/api/v1/auth', authRoutes)
 
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec))
 

@@ -28,6 +28,12 @@ export const swaggerSpec = swaggerJsdoc({
 
     tags,
 
+    security: [
+      {
+        bearerAuth: [],
+      },
+    ],
+
     components: {
       securitySchemes: {
         bearerAuth: {

@@ -68,29 +68,46 @@ export const schemas = {
   RegisterRequest: {
     type: 'object',
 
-    required: ['firstName', 'lastName', 'email', 'password'],
+    required: ['factoryName', 'email', 'password', 'confirmPassword', 'teamSize', 'currency'],
 
     properties: {
-      firstName: {
+      factoryName: {
         type: 'string',
-        example: 'John',
-      },
-
-      lastName: {
-        type: 'string',
-        example: 'Doe',
+        example: 'Mije Fashion Store',
+        description: 'Name of the workspace (tenant factory)',
       },
 
       email: {
         type: 'string',
         format: 'email',
-        example: 'john@example.com',
+        example: 'mdigban@gmail.com',
+        description: 'Admin email for the workspace',
       },
 
       password: {
         type: 'string',
         format: 'password',
-        example: 'Password123',
+        example: 'Atela234!',
+        description: 'User password (min 8 characters recommended)',
+      },
+
+      confirmPassword: {
+        type: 'string',
+        format: 'password',
+        example: 'Atela234!',
+        description: 'Must match password exactly',
+      },
+
+      teamSize: {
+        type: 'integer',
+        example: 15,
+        description: 'Expected number of team members in the workspace',
+      },
+
+      currency: {
+        type: 'string',
+        example: 'NGN',
+        description: 'Default workspace currency',
       },
     },
   },

@@ -30,11 +30,19 @@ enum VerificationType {
   TWO_FACTOR
 }
 
+enum Currency {
+  USD
+  EUR
+  GBP
+  NGN
+}
+
 model Tenant {
   id String @id @default(uuid())
   name String 
-  teamSize String?
+  teamSize Int?
   slug String @unique
+  currency  Currency @default(NGN)
   isOnboarded Boolean @default(false)
   isSuspended Boolean @default(false)
   status TenantStatus @default(ACTIVE)
@@ -47,8 +55,8 @@ model User {
   id String @id @default(uuid())
   tenantId String? 
   tenant Tenant? @relation(fields: [tenantId], references: [id])
-  firstName String
-  lastName String
+  firstName String?
+  lastName String?
   email String @unique
   password String
   role UserRole @default(ADMIN)
