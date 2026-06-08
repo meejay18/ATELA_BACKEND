@@ -9,6 +9,7 @@ import { notFoundHandler } from '../shared/ERRORS/not-found-error'
 import { authRoutes } from '../modules/AUTH/routes/auth.routes'
 import swaggerUi from 'swagger-ui-express'
 import { swaggerSpec } from '../shared/CONFIG/swagger'
+import { Request, Response } from 'express'
 
 export const app = express()
 
@@ -23,7 +24,7 @@ app.use('/api/v1/auth', authRoutes)
 
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec))
 
-app.get('/health', (_req, res) => {
+app.get('/health', (_req: Request, res: Response) => {
   return res.status(200).json({
     success: true,
     message: 'Atela API up and running',
