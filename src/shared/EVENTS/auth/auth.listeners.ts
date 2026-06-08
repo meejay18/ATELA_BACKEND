@@ -4,8 +4,18 @@ import { AUTH_EVENTS } from './auth.events'
 import { sendEmail } from '../../EMAIL/email-service'
 import { registerWorkspaceTemplate } from '../../EMAIL/templates/create-workspaceTemplate'
 
+type WorkspaceCreatedEvent = {
+  userId: string
+  email: string
+  tenantId: string
+  tenantName: string
+  teamSize: number
+  currency: string
+  verificationCode: string
+}
+
 export const registerAuthListeners = () => {
-  eventBus.on(AUTH_EVENTS.WORKSPACE_CREATED, async (payload) => {
+  eventBus.on(AUTH_EVENTS.WORKSPACE_CREATED, async (payload: WorkspaceCreatedEvent) => {
     try {
       await sendEmail({
         to: payload.email,
