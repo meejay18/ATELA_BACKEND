@@ -3,9 +3,11 @@ import { env } from '../shared/CONFIG/env'
 import { logger } from '../shared/LOGGER'
 import { registerEvents } from '../shared/EVENTS/register-events'
 import { prisma } from '../shared/DATABASE/prisma'
+import { verifyEmailConnection } from '../shared/EMAIL/email-service'
 
 export const startServer = async () => {
   try {
+    await verifyEmailConnection()
     registerEvents()
 
     await prisma.$connect()
