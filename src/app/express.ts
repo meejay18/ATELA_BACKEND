@@ -14,7 +14,11 @@ import { Request, Response } from 'express'
 export const app = express()
 
 app.use(helmet())
-app.use(cors())
+app.use(
+  cors({
+    origin: '*',
+  }),
+)
 app.use(httpLogger)
 app.use(compression())
 app.use(cookieParser())

@@ -23,6 +23,7 @@ export const registerAuthListeners = () => {
         html: registerWorkspaceTemplate({
           tenantName: payload.tenantName,
           email: payload.email,
+          code: payload.verificationCode,
         }),
       })
       logger.info({ email: payload.email, tenant: payload.tenantName }, 'Workspace created, event received')

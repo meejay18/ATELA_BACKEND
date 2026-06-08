@@ -4,6 +4,7 @@ import { tags } from './tags'
 import { schemas } from './schemas'
 import { responses } from './responses'
 import { parameters } from './parameters'
+import { env } from '../env'
 
 export const swaggerSpec = swaggerJsdoc({
   definition: {
@@ -17,12 +18,8 @@ export const swaggerSpec = swaggerJsdoc({
 
     servers: [
       {
-        url: 'http://localhost:5000/api/v1',
-        description: 'Development',
-      },
-      {
-        url: 'https://api.atela.com/api/v1',
-        description: 'Production Server',
+        url: `${env.API_BASE_URL}`,
+        description: 'API Server',
       },
     ],
 

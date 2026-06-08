@@ -64,6 +64,6 @@ export const registerWorkspace = async (input: CreateWorkspaceInput): Promise<Re
   return {
     userId: user.id,
     email: user.email,
-    message: `Verifcation Successful, Code sent to ${user.email}`,
+    message: `Verification Successful, Code sent to ${user.email}`,
   }
 }
