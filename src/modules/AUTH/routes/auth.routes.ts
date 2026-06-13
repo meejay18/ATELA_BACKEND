@@ -1,7 +1,10 @@
 import { Router } from 'express'
 // import { authMiddleware } from '../../../shared/MIDDLEWARE/auth-middleware'
 // import { superAdminMiddleware } from '../../../shared/MIDDLEWARE/superAdmin-middleware'
-import { createWorkSpaceController } from '../controller/auth.controller'
+import { createWorkSpaceController, verifyEmailController } from '../controller/auth.controller'
+import { validate } from '../../../shared/MIDDLEWARE/validate'
+import { verifyEmailSchema } from '../validator/verify-email.validator'
+import { createWorkspaceSchema } from '../validator/register-workspace.validator'
 
 const router = Router()
 
@@ -66,6 +69,130 @@ const router = Router()
  *       500:
  *         description: Internal Server Error
  */
-router.post('/register-workspace', createWorkSpaceController)
+router.post(
+  '/register-workspace',
+  validate({
+    body: createWorkspaceSchema,
+  }),
+  createWorkSpaceController,
+)
+
+/**
+ * @swagger
+ * /auth/verify-email:
+ *   post:
+ *     tags:
+ *       - Authentication
+ *
+ *     summary: Verify user email address
+ *
+ *     description: |
+ *       This endpoint verifies a user's email address using the verification code
+ *       sent during workspace registration.
+ *
+ *       ### What happens internally:
+ *       - The user is located using the provided email address
+ *       - The verification code is validated
+ *       - The code expiry time is checked
+ *       - The user's email is marked as verified
+ *       - Access and refresh tokens are generated
+ *       - A refresh token is stored in the database
+ *       - An email verified event is emitted
+ *
+ *       ### Important Rules:
+ *       - The email must belong to a registered user
+ *       - The verification code must be valid
+ *       - The verification code must not be expired
+ *       - An already verified email cannot be verified again
+ *
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/VerifyEmailRequest'
+ *
+ *     responses:
+ *       200:
+ *         description: Email verified successfully
+ *         headers:
+ *           Set-Cookie:
+ *             description: HttpOnly refresh token cookie
+ *             schema:
+ *               type: string
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ApiResponse'
+ *             example:
+ *               success: true
+ *               message: Email verified Successfully
+ *               data:
+ *                 accessToken: "eyJhbGciOiJIUzI1NiIs..."
+ *                 message: "Email verified successfully"
+ *
+ *       400:
+ *         description: Validation failed
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *             example:
+ *               success: false
+ *               message: Validation failed
+ *               errors:
+ *                 body:
+ *                   fieldErrors:
+ *                     email:
+ *                       - Invalid email address
+ *                     code:
+ *                       - String must contain exactly 6 character(s)
+ *
+ *       401:
+ *         description: Invalid verification attempt
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *             examples:
+ *               UserNotFound:
+ *                 summary: User does not exist
+ *                 value:
+ *                   success: false
+ *                   message: User not found
+ *
+ *               InvalidCode:
+ *                 summary: Invalid or expired code
+ *                 value:
+ *                   success: false
+ *                   message: Invalid or expired Verification code
+ *
+ *       409:
+ *         description: Email already verified
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *             example:
+ *               success: false
+ *               message: Email already verified
+ *
+ *       500:
+ *         description: Internal Server Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *             example:
+ *               success: false
+ *               message: Internal Server Error
+ */
+router.post(
+  '/verify-email',
+  validate({
+    body: verifyEmailSchema,
+  }),
+  verifyEmailController,
+)
 
 export { router as authRoutes }

@@ -51,4 +51,24 @@ export const authRepository = {
   }) => {
     return prisma.verificationCode.create({ data })
   },
+
+  findVerificationCode: (userId: string, code: string) => {
+    return prisma.verificationCode.findFirst({
+      where: {
+        userId,
+        code,
+        type: VerificationType.EMAIL_VERIFICATION,
+      },
+      orderBy: { createdAt: 'desc' },
+    })
+  },
+
+  markUserAsVerified: (userId: string) => {
+    return prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: { isVerified: true },
+    })
+  },
 }

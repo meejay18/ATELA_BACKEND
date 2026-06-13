@@ -4,7 +4,7 @@ import { randomUUID } from 'crypto'
 export const httpLogger = pinoHttp({
   logger,
 
-  genReqId: (req) => {
+  genReqId: (req, res) => {
     return (req.headers['x-request-id'] as string) || randomUUID()
   },
 
@@ -23,7 +23,7 @@ export const httpLogger = pinoHttp({
     },
   },
 
-  customLogLevel: (res, err) => {
+  customLogLevel: (req, res, err) => {
     const status = res.statusCode ?? 500
 
     if (err || status >= 500) return 'error'

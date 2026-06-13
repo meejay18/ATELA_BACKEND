@@ -8,7 +8,11 @@ import { eventBus } from '../../../shared/EVENTS/events-bus'
 import { AUTH_EVENTS } from '../../../shared/EVENTS/auth/auth.events'
 import { logger } from '../../../shared/LOGGER'
 import slugify from 'slugify'
+import { UnauthorizedError } from '../../../shared/ERRORS/unauthorized-error'
 const OTP_EXPIRY_MINUTES = 15
+import jwt from 'jsonwebtoken'
+import { env } from '../../../shared/CONFIG/env'
+import type { StringValue } from 'ms'
 
 export const registerWorkspace = async (input: CreateWorkspaceInput): Promise<RegisterResponse> => {
   const existingUser = await authRepository.findUserByEmail(input.email)
@@ -65,5 +69,51 @@ export const registerWorkspace = async (input: CreateWorkspaceInput): Promise<Re
     userId: user.id,
     email: user.email,
     message: `Verification Successful, Code sent to ${user.email}`,
+  }
+}
+
+export const verifyEmail = async (
+  email: string,
+  code: string,
+): Promise<{ accessToken: string; refreshToken: string; message: string }> => {
+  const user = await authRepository.findUserByEmail(email)
+
+  if (!user) {
+    throw new UnauthorizedError('User not found')
+  }
+
+  if (user.isVerified) {
+    throw new ConflictError('Email already verified')
+  }
+
+  const verification = await authRepository.findVerificationCode(user.id, code)
+
+  if (!verification || verification.expiresAt < new Date()) {
+    throw new UnauthorizedError('Invalid or expired Verification code')
+  }
+  await authRepository.markUserAsVerified(user.id)
+
+  const accessToken = jwt.sign({ userId: user.id }, env.JWT_ACCESS_SECRET, {
+    expiresIn: env.JWT_ACCESS_EXPIRES as StringValue,
+  })
+
+  const refreshToken = jwt.sign({ userId: user.id }, env.JWT_REFRESH_SECRET, {
+    expiresIn: env.JWT_REFRESH_EXPIRES as StringValue,
+  })
+
+  await authRepository.createRefreshToken({
+    token: refreshToken,
+    userId: user.id,
+    expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+  })
+
+  eventBus.emit(AUTH_EVENTS.EMAIL_VERIFIED, { userId: user.id })
+
+  logger.info({ userId: user.id }, 'Email Verified Successfully')
+
+  return {
+    accessToken,
+    refreshToken,
+    message: 'Email verified successfully',
   }
 }

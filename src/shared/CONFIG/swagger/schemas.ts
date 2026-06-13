@@ -155,4 +155,25 @@ export const schemas = {
       },
     },
   },
+
+  VerifyEmailRequest: {
+    type: 'object',
+
+    required: ['email', 'code'],
+
+    properties: {
+      email: {
+        type: 'string',
+        format: 'email',
+        example: 'mdigban@gmail.com',
+        description: 'Email address used during workspace registration',
+      },
+
+      code: {
+        type: 'string',
+        example: '123456',
+        description: '6-digit email verification code sent to the user email',
+      },
+    },
+  },
 }
