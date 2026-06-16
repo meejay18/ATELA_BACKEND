@@ -176,4 +176,19 @@ export const schemas = {
       },
     },
   },
+
+  ResendVerificationCodeRequest: {
+    type: 'object',
+
+    required: ['email'],
+
+    properties: {
+      email: {
+        type: 'string',
+        format: 'email',
+        example: 'mdigban@gmail.com',
+        description: 'Registered email address associated with the account',
+      },
+    },
+  },
 }

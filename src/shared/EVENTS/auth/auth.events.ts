@@ -3,4 +3,5 @@ export const AUTH_EVENTS = {
   EMAIL_VERIFIED: 'auth:email_verified',
   LOGIN: 'auth:login',
   LOGOUT: 'auth:logout',
+  RESEND_VERIFICATION: `auth:resend verification code`,
 } as const

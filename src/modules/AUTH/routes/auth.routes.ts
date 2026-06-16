@@ -1,10 +1,15 @@
 import { Router } from 'express'
 // import { authMiddleware } from '../../../shared/MIDDLEWARE/auth-middleware'
 // import { superAdminMiddleware } from '../../../shared/MIDDLEWARE/superAdmin-middleware'
-import { createWorkSpaceController, verifyEmailController } from '../controller/auth.controller'
+import {
+  createWorkSpaceController,
+  resendVerificationCodeController,
+  verifyEmailController,
+} from '../controller/auth.controller'
 import { validate } from '../../../shared/MIDDLEWARE/validate'
 import { verifyEmailSchema } from '../validator/verify-email.validator'
 import { createWorkspaceSchema } from '../validator/register-workspace.validator'
+import { resendVerificationSchema } from '../validator/resendCode.validator'
 
 const router = Router()
 
@@ -193,6 +198,106 @@ router.post(
     body: verifyEmailSchema,
   }),
   verifyEmailController,
+)
+
+/**
+ * @swagger
+ * /auth/resendVerificationCode:
+ *   post:
+ *     tags:
+ *       - Authentication
+ *
+ *     summary: Resend email verification code
+ *
+ *     description: |
+ *       This endpoint generates and sends a new email verification code
+ *       to a user who has not yet verified their email address.
+ *
+ *       ### What happens internally:
+ *       - The user is located using the provided email address
+ *       - The user's verification status is checked
+ *       - A new verification code is generated
+ *       - A new expiration time is created
+ *       - The verification code is stored in the database
+ *       - A resend verification event is emitted
+ *       - A verification email is sent asynchronously
+ *
+ *       ### Important Rules:
+ *       - The email must belong to an existing user
+ *       - The user must not already be verified
+ *       - A new verification code replaces previous verification attempts
+ *
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/ResendVerificationCodeRequest'
+ *
+ *     responses:
+ *       200:
+ *         description: Verification code sent successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ApiResponse'
+ *             example:
+ *               success: true
+ *               message: verification email sent successfully
+ *               data:
+ *                 message: Verification code resent to johndoe@example.com
+ *
+ *       400:
+ *         description: Validation failed
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *             example:
+ *               success: false
+ *               message: Failed to send Verification code
+ *               errors:
+ *                 body:
+ *                   fieldErrors:
+ *                     email:
+ *                       - Invalid email address
+ *
+ *       404:
+ *         description: User not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *             example:
+ *               success: false
+ *               message: User not found
+ *
+ *       409:
+ *         description: User already verified
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *             example:
+ *               success: false
+ *               message: User already verified
+ *
+ *       500:
+ *         description: Internal Server Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *             example:
+ *               success: false
+ *               message: Internal Server Error
+ */
+router.post(
+  '/resendVerificationCode',
+  validate({
+    body: resendVerificationSchema,
+  }),
+  resendVerificationCodeController,
 )
 
 export { router as authRoutes }

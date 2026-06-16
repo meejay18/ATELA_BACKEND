@@ -2,7 +2,10 @@ import { logger } from '../../LOGGER'
 import { eventBus } from '../events-bus'
 import { AUTH_EVENTS } from './auth.events'
 import { sendEmail } from '../../EMAIL/email-service'
-import { registerWorkspaceTemplate } from '../../EMAIL/templates/create-workspaceTemplate'
+import {
+  registerWorkspaceTemplate,
+  resendVerificationCodeTemplate,
+} from '../../EMAIL/templates/create-workspaceTemplate'
 
 type WorkspaceCreatedEvent = {
   userId: string
@@ -42,6 +45,28 @@ export const registerAuthListeners = () => {
     logger.info(payload, 'Email verified event received')
   })
 
+  eventBus.on(AUTH_EVENTS.RESEND_VERIFICATION, async (payload) => {
+    try {
+      await sendEmail({
+        to: payload.email,
+        subject: 'Verify Your Email',
+        html: resendVerificationCodeTemplate({
+          email: payload.email,
+          code: payload.resendVerificationCode,
+        }),
+      })
+
+      logger.info(payload, 'Verification Code Resent')
+    } catch (error) {
+      logger.error(
+        {
+          error,
+          email: payload.email,
+        },
+        'Failed to send verification email',
+      )
+    }
+  })
   eventBus.on(AUTH_EVENTS.LOGIN, async (payload) => {
     logger.info(payload, 'User login event received')
   })

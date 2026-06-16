@@ -13,6 +13,7 @@ const OTP_EXPIRY_MINUTES = 15
 import jwt from 'jsonwebtoken'
 import { env } from '../../../shared/CONFIG/env'
 import type { StringValue } from 'ms'
+import { NotFoundError } from '../../../shared/ERRORS/not-found-error'
 
 export const registerWorkspace = async (input: CreateWorkspaceInput): Promise<RegisterResponse> => {
   const existingUser = await authRepository.findUserByEmail(input.email)
@@ -115,5 +116,45 @@ export const verifyEmail = async (
     accessToken,
     refreshToken,
     message: 'Email verified successfully',
+  }
+}
+
+export const resendVerificationCode = async (email: string): Promise<{ message: string }> => {
+  const user = await authRepository.findUserByEmail(email)
+  if (!user) {
+    throw new NotFoundError('User not found')
+  }
+
+  if (user.isVerified) {
+    throw new ConflictError('User already verified')
+  }
+
+  const code = otpService.generateOtp()
+  const expiresAt = new Date(Date.now() + OTP_EXPIRY_MINUTES * 60 * 1000)
+
+  await authRepository.createVerificationCode({
+    userId: user.id,
+    code,
+    type: 'EMAIL_VERIFICATION',
+    expiresAt,
+  })
+
+  // emit events for resend verificatin code
+  eventBus.emit(AUTH_EVENTS.RESEND_VERIFICATION, {
+    userId: user.id,
+    email: user.email,
+    resendVerificationCode: code,
+  })
+
+  logger.info(
+    {
+      userId: user.id,
+      email: user.email,
+    },
+    'Resent verification email',
+  )
+
+  return {
+    message: `Verification code resent to ${user.email}`,
   }
 }

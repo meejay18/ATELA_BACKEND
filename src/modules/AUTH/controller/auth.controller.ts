@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express'
 import { createWorkspaceSchema } from '../validator/register-workspace.validator'
-import { registerWorkspace, verifyEmail } from '../services/auth.service'
+import { registerWorkspace, resendVerificationCode, verifyEmail } from '../services/auth.service'
 import { errorResponse, successResponse } from '../../../shared/RESPONSES/api-response'
 
 export const createWorkSpaceController = async (req: Request, res: Response, next: NextFunction) => {
@@ -43,6 +43,21 @@ export const verifyEmailController = async (req: Request, res: Response, next: N
   } catch (error: any) {
     if (error.errors) {
       return res.status(400).json(errorResponse('Validation failed', error.errors))
+    }
+    return next(error)
+  }
+}
+
+export const resendVerificationCodeController = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { email } = req.body
+
+    const result = await resendVerificationCode(email)
+
+    return res.status(200).json(successResponse(result, 'verification email sent successfully'))
+  } catch (error: any) {
+    if (error.errors) {
+      return res.status(400).json(errorResponse('Failed to send Verification code', error.errors))
     }
     return next(error)
   }
