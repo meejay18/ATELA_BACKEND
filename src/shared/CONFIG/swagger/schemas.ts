@@ -45,26 +45,6 @@ export const schemas = {
     },
   },
 
-  LoginRequest: {
-    type: 'object',
-
-    required: ['email', 'password'],
-
-    properties: {
-      email: {
-        type: 'string',
-        format: 'email',
-        example: 'john@example.com',
-      },
-
-      password: {
-        type: 'string',
-        format: 'password',
-        example: 'Password123',
-      },
-    },
-  },
-
   RegisterRequest: {
     type: 'object',
 
@@ -188,6 +168,28 @@ export const schemas = {
         format: 'email',
         example: 'mdigban@gmail.com',
         description: 'Registered email address associated with the account',
+      },
+    },
+  },
+
+  LoginRequest: {
+    type: 'object',
+
+    required: ['email', 'password'],
+
+    properties: {
+      email: {
+        type: 'string',
+        format: 'email',
+        example: 'johndoe@example.com',
+        description: 'User registered email address',
+      },
+
+      password: {
+        type: 'string',
+        format: 'password',
+        example: 'StrongPassword123!',
+        description: 'User account password',
       },
     },
   },

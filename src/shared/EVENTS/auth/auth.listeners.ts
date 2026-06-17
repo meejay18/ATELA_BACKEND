@@ -5,7 +5,7 @@ import { sendEmail } from '../../EMAIL/email-service'
 import {
   registerWorkspaceTemplate,
   resendVerificationCodeTemplate,
-} from '../../EMAIL/templates/create-workspaceTemplate'
+} from '../../EMAIL/templates/emailTemplates'
 
 type WorkspaceCreatedEvent = {
   userId: string

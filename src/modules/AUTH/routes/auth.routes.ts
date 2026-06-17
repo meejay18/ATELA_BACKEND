@@ -3,6 +3,7 @@ import { Router } from 'express'
 // import { superAdminMiddleware } from '../../../shared/MIDDLEWARE/superAdmin-middleware'
 import {
   createWorkSpaceController,
+  loginController,
   resendVerificationCodeController,
   verifyEmailController,
 } from '../controller/auth.controller'
@@ -10,6 +11,8 @@ import { validate } from '../../../shared/MIDDLEWARE/validate'
 import { verifyEmailSchema } from '../validator/verify-email.validator'
 import { createWorkspaceSchema } from '../validator/register-workspace.validator'
 import { resendVerificationSchema } from '../validator/resendCode.validator'
+import { loginSchema } from '../validator/login.validator'
+import { authMiddleware } from '../../../shared/MIDDLEWARE/auth-middleware'
 
 const router = Router()
 
@@ -298,6 +301,105 @@ router.post(
     body: resendVerificationSchema,
   }),
   resendVerificationCodeController,
+)
+
+/**
+ * @swagger
+ * /auth/login:
+ *   post:
+ *     tags:
+ *       - Authentication
+ *
+ *     summary: Login user
+ *
+ *     description: |
+ *       Authenticates a user using email and password.
+ *
+ *       ### What happens internally:
+ *       - User is retrieved by email
+ *       - Password is validated against hashed password
+ *       - User verification status is checked
+ *       - Access token is generated
+ *       - Refresh token is generated and stored in DB
+ *       - Refresh token is also set in an HTTP-only cookie
+ *       - Login event is emitted for logging/analytics
+ *
+ *       ### Security Notes:
+ *       - Access token is returned in response body
+ *       - Refresh token is stored in httpOnly cookie
+ *       - Only verified users can login
+ *
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/LoginRequest'
+ *
+ *     responses:
+ *       200:
+ *         description: Login successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ApiResponse'
+ *             example:
+ *               success: true
+ *               message: Login Successful
+ *               data:
+ *                 accessToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+ *                 message: Login Successful
+ *
+ *       400:
+ *         description: Validation failed
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *             example:
+ *               success: false
+ *               message: Validation Failed
+ *               errors:
+ *                 body:
+ *                   fieldErrors:
+ *                     email:
+ *                       - Invalid email address
+ *
+ *       401:
+ *         description: Unauthorized (invalid credentials or unverified user)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *             examples:
+ *               invalidCredentials:
+ *                 summary: Invalid email or password
+ *                 value:
+ *                   success: false
+ *                   message: Invalid email or password
+ *
+ *               unverifiedUser:
+ *                 summary: User not verified
+ *                 value:
+ *                   success: false
+ *                   message: User is not verified
+ *
+ *       500:
+ *         description: Internal Server Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *             example:
+ *               success: false
+ *               message: Internal Server Error
+ */
+router.post(
+  '/login',
+  validate({
+    body: loginSchema,
+  }),
+  loginController,
 )
 
 export { router as authRoutes }

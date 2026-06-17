@@ -14,6 +14,7 @@ import jwt from 'jsonwebtoken'
 import { env } from '../../../shared/CONFIG/env'
 import type { StringValue } from 'ms'
 import { NotFoundError } from '../../../shared/ERRORS/not-found-error'
+import { tokenService } from './token.service'
 
 export const registerWorkspace = async (input: CreateWorkspaceInput): Promise<RegisterResponse> => {
   const existingUser = await authRepository.findUserByEmail(input.email)
@@ -156,5 +157,58 @@ export const resendVerificationCode = async (email: string): Promise<{ message: 
 
   return {
     message: `Verification code resent to ${user.email}`,
+  }
+}
+
+export const login = async (
+  email: string,
+  password: string,
+): Promise<{ accessToken: string; refreshToken: string; message: string }> => {
+  const user = await authRepository.findUserByEmail(email)
+
+  if (!user) {
+    throw new UnauthorizedError('Invalid email or password')
+  }
+
+  const isValidPassword = await passwordService.compare(password, user.password)
+  if (!isValidPassword) {
+    throw new UnauthorizedError('Invalid email or password')
+  }
+
+  if (!user.isVerified) {
+    throw new UnauthorizedError('User is not verified')
+  }
+
+  const accessToken = tokenService.generateAccessToken({
+    userId: user.id,
+    role: user.role,
+    tenantId: user.tenantId,
+  })
+  const refreshToken = tokenService.generateRefreshToken({
+    userId: user.id,
+    role: user.role,
+    tenantId: user.tenantId,
+  })
+
+  // store refreshToken in db
+  await authRepository.createRefreshToken({
+    token: refreshToken,
+    userId: user.id,
+    expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+  })
+
+  eventBus.emit(AUTH_EVENTS.LOGIN, {
+    userId: user.id,
+    email: user.email,
+    tenantId: user.tenantId,
+    role: user.role,
+  })
+
+  logger.info({ userId: user.id, email: user.email }, 'Login Successful')
+
+  return {
+    accessToken,
+    refreshToken,
+    message: 'Login Successful',
   }
 }
