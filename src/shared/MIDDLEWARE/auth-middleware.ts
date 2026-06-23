@@ -10,7 +10,7 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
     const authHeader = req.headers.authorization
 
     if (!authHeader?.startsWith('Bearer')) {
-      throw new UnauthorizedError('Missing or malformed authorization header')
+      throw new UnauthorizedError('Unauthorized')
     }
 
     const token = authHeader.slice(7)

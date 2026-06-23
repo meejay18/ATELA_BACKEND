@@ -14,6 +14,46 @@ datasource db {
   INACTIVE
  }
 
+enum OrderStatus {
+PENDING
+IN_PROGRESS
+COMPLETED
+CANCELLED
+}
+
+enum TaskType {
+  PATTERN_MAKING
+  CUTTING
+  TAILORING
+  QUALITY_CHECK
+}
+
+enum TaskStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  BLOCKED
+}
+
+enum InventoryCategory {
+  FABRIC
+  THREAD
+  BUTTON
+  ZIPPER
+  LINING
+  ACCESSORY
+  OTHER
+}
+
+enum NotificationType {
+  ORDER_CREATED
+  ORDER_UPDATED
+  TASK_ASSIGNED
+  TASK_COMPLETED
+  INVENTORY_LOW
+  PAYMENT_RECORDED
+}
+
 enum UserRole {
   SUPER_ADMIN
   ADMIN
@@ -21,7 +61,7 @@ enum UserRole {
   PATTERN_MAKER
   CUTTER
   TAILOR
-  FINISHER
+  QUALITY_CONTROL
 }
 
 enum VerificationType {
@@ -46,9 +86,14 @@ model Tenant {
   isOnboarded Boolean @default(false)
   isSuspended Boolean @default(false)
   status TenantStatus @default(ACTIVE)
+
+
   users User[]
+  orders Order[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
 }
 
 model User {
@@ -63,6 +108,9 @@ model User {
   isVerified Boolean @default(false)
   verifiedAt DateTime?
   isActive Boolean @default(true)
+
+  orders Order[]
+  
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -102,4 +150,57 @@ model verificationCode {
 
   @@index([userId])
   @@index([code])
+}
+
+enum OrderType {
+  CUSTOM_ORDER
+  READY_TO_WEAR
+}
+
+enum ProductionStage {
+  PATTERN_MAKING
+  CUTTING
+  TAILORING
+  FINISHING
+  QUALITY_CONTROL
+  PACKAGING
+}
+
+model Order {
+  id String @id @default(uuid())
+  tenantId String
+  createdById String
+  orderNumber String @unique
+  orderType OrderType
+  description String?
+  status OrderStatus @default(PENDING)
+  garmentType String
+  quantity Int
+  deadline DateTime?
+  stageToStart  ProductionStage
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tenant Tenant  @relation(fields: [tenantId], references: [id])
+  createdBy User @relation(fields: [createdById], references:[id])
+
+  customOrder CustomOrder?
+  readyToWear ReadyToWear? 
+
+}
+
+model CustomOrder {
+  id String @id @default(uuid())
+  orderId String @unique
+  clientName String 
+  clientPhone String?
+
+  order Order @relation(fields:[orderId], references:[id], onDelete: Cascade)
+}
+
+model ReadyToWear {
+  id String @id @default(uuid())
+  orderId String @unique
+
+  order Order @relation(fields:[orderId], references:[id], onDelete: Cascade)
 }

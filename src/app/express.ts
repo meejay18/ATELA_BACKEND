@@ -10,6 +10,7 @@ import { authRoutes } from '../modules/AUTH/routes/auth.routes'
 import swaggerUi from 'swagger-ui-express'
 import { swaggerSpec } from '../shared/CONFIG/swagger'
 import { Request, Response } from 'express'
+import { orderRoutes } from '../modules/ORDER/routes/order.routes'
 
 export const app = express()
 
@@ -25,6 +26,7 @@ app.use(cookieParser())
 app.use(express.json())
 
 app.use('/api/v1/auth', authRoutes)
+app.use('/api/v1/order', orderRoutes)
 
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec))
 
