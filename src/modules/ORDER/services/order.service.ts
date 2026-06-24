@@ -37,7 +37,6 @@ export const createCustomOrderService = async (
     },
     'Custom Order Created',
   )
-
   return {
     orderId: order.id,
     orderNumber: order.orderNumber,

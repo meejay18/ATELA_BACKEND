@@ -1,11 +1,11 @@
 import { Request, Response, NextFunction } from 'express'
-import { createCustomOrderSchema } from '../validator/create-order.validator'
+import { createCustomOrderInput } from '../validator/create-order.validator'
 import { createCustomOrderService } from '../services/order.service'
 import { errorResponse, successResponse } from '../../../shared/RESPONSES/api-response'
 
 export const createCustomOrderController = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const parsedInput = createCustomOrderSchema.parse(req.body)
+    const input = req.body as createCustomOrderInput
 
     const { tenantId, userId: createdById } = req.user!
 
@@ -13,14 +13,10 @@ export const createCustomOrderController = async (req: Request, res: Response, n
       return res.status(401).json(errorResponse('Invalid Tenant ID'))
     }
 
-    const result = await createCustomOrderService(parsedInput, tenantId, createdById)
+    const result = await createCustomOrderService(input, tenantId, createdById)
 
-    return res.status(200).json(successResponse(result, 'Order created successfully'))
+    return res.status(201).json(successResponse(result, 'Order created successfully'))
   } catch (error: any) {
-    if (error.errors) {
-      return res.status(400).json(errorResponse('Validation failed', error.errors))
-    }
-
     return next(error)
   }
 }

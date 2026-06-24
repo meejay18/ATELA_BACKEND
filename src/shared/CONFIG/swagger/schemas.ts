@@ -5,15 +5,18 @@ export const schemas = {
       success: {
         type: 'boolean',
         example: true,
+        description: 'Indicates whether the request was successful.',
       },
 
       message: {
         type: 'string',
         example: 'Request successful',
+         description: 'Human-readable response message.',
       },
 
       data: {
         type: 'object',
+        description: 'Response payload. The structure depends on the endpoint.',
       },
     },
   },
@@ -190,6 +193,117 @@ export const schemas = {
         format: 'password',
         example: 'StrongPassword123!',
         description: 'User account password',
+      },
+    },
+  },
+
+  CreateCustomOrderRequest: {
+    type: 'object',
+
+    required: ['clientName', 'garmentType', 'quantity', 'stageToStart'],
+
+    properties: {
+      clientName: {
+        type: 'string',
+        example: 'John Doe',
+        description: 'Full name of the customer.',
+      },
+
+      clientPhone: {
+        type: 'string',
+        nullable: true,
+        example: '+2348012345678',
+        description: 'Customer phone number.',
+      },
+
+      garmentType: {
+        type: 'string',
+        example: 'Senator',
+        description: 'Type of garment requested.',
+      },
+
+      quantity: {
+        type: 'integer',
+        minimum: 1,
+        example: 2,
+        description: 'Number of garments to produce.',
+      },
+
+      deadline: {
+        type: 'string',
+        format: 'date-time',
+        nullable: true,
+        example: '2026-07-20T12:00:00.000Z',
+        description: 'Expected completion date.',
+      },
+
+      stageToStart: {
+        type: 'string',
+        enum: ['CUTTING', 'SEWING', 'ASSEMBLING', 'FINISHING', 'QUALITY_CHECK', 'READY'],
+        example: 'CUTTING',
+        description: 'Production stage where work begins.',
+      },
+
+      description: {
+        type: 'string',
+        nullable: true,
+        example: 'Use black fabric with gold buttons.',
+        description: 'Additional production instructions.',
+      },
+    },
+  },
+
+  CreateCustomOrderResponse: {
+    type: 'object',
+
+    properties: {
+      orderId: {
+        type: 'string',
+        format: 'uuid',
+        example: '6e6b4b57-c772-4b68-aeb4-c13a24865a6b',
+      },
+
+      orderNumber: {
+        type: 'string',
+        example: 'ORD-20260624-0001',
+      },
+
+      status: {
+        type: 'string',
+        example: 'PENDING',
+      },
+
+      clientName: {
+        type: 'string',
+        example: 'John Doe',
+      },
+
+      garmentType: {
+        type: 'string',
+        example: 'Senator',
+      },
+
+      quantity: {
+        type: 'integer',
+        example: 2,
+      },
+
+      deadline: {
+        type: 'string',
+        format: 'date-time',
+        nullable: true,
+        example: '2026-07-20T12:00:00.000Z',
+      },
+
+      stageToStart: {
+        type: 'string',
+        example: 'CUTTING',
+      },
+
+      createdAt: {
+        type: 'string',
+        format: 'date-time',
+        example: '2026-06-24T16:20:45.230Z',
       },
     },
   },
