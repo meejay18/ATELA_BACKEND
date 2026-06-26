@@ -36,6 +36,10 @@ export const registerWorkspace = async (input: CreateWorkspaceInput): Promise<Re
     currency: input.currency,
   })
 
+  if (input.password !== input.confirmPassword) {
+    throw new ConflictError('Passwords do not match')
+  }
+
   const hashPassword = await passwordService.hash(input.password)
 
   const user = await authRepository.createUser({
