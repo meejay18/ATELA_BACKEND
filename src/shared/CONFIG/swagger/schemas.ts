@@ -11,7 +11,7 @@ export const schemas = {
       message: {
         type: 'string',
         example: 'Request successful',
-         description: 'Human-readable response message.',
+        description: 'Human-readable response message.',
       },
 
       data: {
@@ -304,6 +304,58 @@ export const schemas = {
         type: 'string',
         format: 'date-time',
         example: '2026-06-24T16:20:45.230Z',
+      },
+    },
+  },
+
+  GetUserProfileResponse: {
+    type: 'object',
+
+    properties: {
+      userId: {
+        type: 'string',
+        format: 'uuid',
+        example: 'b3b7ef5d-30c2-4fdb-b8b5-70d8e2d0df58',
+        description: 'Unique identifier of the authenticated user.',
+      },
+
+      email: {
+        type: 'string',
+        format: 'email',
+        example: 'john@example.com',
+        description: 'Email address of the authenticated user.',
+      },
+
+      role: {
+        type: 'string',
+        enum: ['SUPER_ADMIN', 'ADMIN', 'STAFF'],
+        example: 'ADMIN',
+        description: 'Role assigned to the authenticated user.',
+      },
+
+      tenant: {
+        type: 'object',
+
+        properties: {
+          tenantId: {
+            type: 'string',
+            format: 'uuid',
+            example: 'af9dd7c4-8d54-4d8f-8d30-6abdf29bdbf0',
+            description: 'Unique identifier of the tenant.',
+          },
+
+          tenantName: {
+            type: 'string',
+            example: 'Atela Fashion House',
+            description: 'Name of the tenant the user belongs to.',
+          },
+
+          teamSize: {
+            type: 'integer',
+            example: 15,
+            description: 'Configured number of team members allowed for the tenant.',
+          },
+        },
       },
     },
   },

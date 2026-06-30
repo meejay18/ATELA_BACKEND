@@ -70,4 +70,7 @@ export const registerAuthListeners = () => {
   eventBus.on(AUTH_EVENTS.LOGIN, async (payload) => {
     logger.info(payload, 'User login event received')
   })
+  eventBus.on(AUTH_EVENTS.PROFILE_RETRIEVED, async (payload) => {
+    logger.info(payload, 'User Profile event received')
+  })
 }

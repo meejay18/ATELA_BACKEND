@@ -1,8 +1,8 @@
 import { Router } from 'express'
-// import { authMiddleware } from '../../../shared/MIDDLEWARE/auth-middleware'
 // import { superAdminMiddleware } from '../../../shared/MIDDLEWARE/superAdmin-middleware'
 import {
   createWorkSpaceController,
+  getUserProfileController,
   loginController,
   resendVerificationCodeController,
   verifyEmailController,
@@ -401,5 +401,95 @@ router.post(
   }),
   loginController,
 )
+
+
+/**
+ * @swagger
+ * /auth/profile:
+ *   get:
+ *     tags:
+ *       - Authentication
+ *
+ *     summary: Get authenticated user's profile
+ *
+ *     description: |
+ *       Retrieves the profile information of the currently authenticated user.
+ *
+ *       ### What happens internally:
+ *       - JWT access token is validated
+ *       - User is extracted from the authenticated request
+ *       - User is retrieved from the database
+ *       - Tenant information is retrieved
+ *       - User profile and tenant details are returned
+ *
+ *       ### Security Notes:
+ *       - Requires a valid Bearer Access Token
+ *       - Users can only retrieve their own profile
+ *
+ *     security:
+ *       - bearerAuth: []
+ *
+ *     responses:
+ *       200:
+ *         description: Profile retrieved successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ApiResponse'
+ *             example:
+ *               success: true
+ *               message: Profile Retrieved
+ *               data:
+ *                 userId: b3b7ef5d-30c2-4fdb-b8b5-70d8e2d0df58
+ *                 email: john@example.com
+ *                 role: ADMIN
+ *                 tenant:
+ *                   tenantId: af9dd7c4-8d54-4d8f-8d30-6abdf29bdbf0
+ *                   tenantName: Atela Fashion House
+ *                   teamSize: 15
+ *
+ *       401:
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *             examples:
+ *               missingToken:
+ *                 summary: Missing or invalid access token
+ *                 value:
+ *                   success: false
+ *                   message: Unauthorized
+ *
+ *       404:
+ *         description: User or Tenant not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *             examples:
+ *               userNotFound:
+ *                 summary: User does not exist
+ *                 value:
+ *                   success: false
+ *                   message: User not found
+ *
+ *               tenantNotFound:
+ *                 summary: Tenant does not exist
+ *                 value:
+ *                   success: false
+ *                   message: Tenant not found
+ *
+ *       500:
+ *         description: Internal Server Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *             example:
+ *               success: false
+ *               message: Internal Server Error
+ */
+router.get('/profile', authMiddleware, getUserProfileController)
 
 export { router as authRoutes }

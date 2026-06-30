@@ -38,6 +38,11 @@ export const authRepository = {
       where: { slug },
     })
   },
+  findTenantById: (id: string) => {
+    return prisma.tenant.findUnique({
+      where: { id },
+    })
+  },
 
   createRefreshToken: (data: { token: string; userId: string; expiresAt: Date }) => {
     return prisma.refreshToken.create({ data })

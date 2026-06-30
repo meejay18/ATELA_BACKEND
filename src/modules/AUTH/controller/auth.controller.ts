@@ -1,7 +1,17 @@
 import { Request, Response, NextFunction } from 'express'
 import { createWorkspaceSchema } from '../validator/register-workspace.validator'
-import { login, registerWorkspace, resendVerificationCode, verifyEmail } from '../services/auth.service'
+import {
+  getUserProfile,
+  login,
+  registerWorkspace,
+  resendVerificationCode,
+  verifyEmail,
+} from '../services/auth.service'
 import { errorResponse, successResponse } from '../../../shared/RESPONSES/api-response'
+import { JwtPayload } from 'jsonwebtoken'
+import { UnauthorizedError } from '../../../shared/ERRORS/unauthorized-error'
+import { authRepository } from '../repository/auth.repository'
+import { logger } from '../../../shared/LOGGER'
 
 export const createWorkSpaceController = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -89,6 +99,26 @@ export const loginController = async (req: Request, res: Response, next: NextFun
     if (error.errors) {
       return res.status(400).json(errorResponse('Validation Failed'))
     }
+    return next(error)
+  }
+}
+
+export const getUserProfileController = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json(errorResponse('Unauthorized'))
+    }
+    const { userId, tenantId } = req.user
+
+    if (!tenantId) {
+      return res.status(404).json(errorResponse('TenantId not found'))
+    }
+
+    const result = await getUserProfile(userId, tenantId)
+
+    logger.info({ userId: userId, tenantId: tenantId }, 'Profile Retrieved')
+    return res.status(200).json(successResponse(result, 'Profile Retrieved'))
+  } catch (error: any) {
     return next(error)
   }
 }

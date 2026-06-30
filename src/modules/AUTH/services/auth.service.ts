@@ -15,6 +15,7 @@ import { env } from '../../../shared/CONFIG/env'
 import type { StringValue } from 'ms'
 import { NotFoundError } from '../../../shared/ERRORS/not-found-error'
 import { tokenService } from './token.service'
+import { email } from 'zod'
 
 export const registerWorkspace = async (input: CreateWorkspaceInput): Promise<RegisterResponse> => {
   const existingUser = await authRepository.findUserByEmail(input.email)
@@ -210,5 +211,37 @@ export const login = async (
     accessToken,
     refreshToken,
     message: 'Login Successful',
+  }
+}
+
+export const getUserProfile = async (userId: string, tenantId: string): Promise<any> => {
+  const user = await authRepository.findUserById(userId)
+  if (!user) {
+    throw new NotFoundError('User not found')
+  }
+
+  const tenant = await authRepository.findTenantById(tenantId)
+
+  if (!tenant) {
+    throw new NotFoundError('Tenant not found')
+  }
+
+  eventBus.emit(AUTH_EVENTS.PROFILE_RETRIEVED, {
+    userId: user.id,
+    email: user.email,
+    tenantId: user.tenantId,
+    role: user.role,
+  })
+  logger.info({ userId, tenantId }, 'Profile Fetched Successfully')
+
+  return {
+    userId: user.id,
+    email: user.email,
+    role: user.role,
+    tenant: {
+      tenantId: tenant.id,
+      tenantName: tenant.name,
+      teamSize: tenant.teamSize,
+    },
   }
 }
