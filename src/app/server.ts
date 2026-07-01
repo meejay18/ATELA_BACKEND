@@ -3,7 +3,7 @@ import { env } from '../shared/CONFIG/env'
 import { logger } from '../shared/LOGGER'
 import { registerEvents } from '../shared/EVENTS/register-events'
 import { prisma } from '../shared/DATABASE/prisma'
-import { verifyEmailConnection } from '../shared/EMAIL/email-service'
+import { verifyEmailConnection } from '../shared/EMAIL/smtp/smtpService'
 
 export const startServer = async () => {
   try {

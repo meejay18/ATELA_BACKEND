@@ -1,7 +1,7 @@
 // import {resend} from "./resend"
 import nodemailer from 'nodemailer'
-import { env } from '../CONFIG/env'
-import { logger } from '../LOGGER'
+import { env } from '../../CONFIG/env'
+import { logger } from '../../LOGGER'
 
 const transporter = nodemailer.createTransport({
   host: env.SMTP_HOST,
@@ -23,13 +23,13 @@ export const verifyEmailConnection = async () => {
   }
 }
 
-type SendEmailParams = {
+type SendEmailInput = {
   to: string
   subject: string
   html: string
 }
 
-export const sendEmail = async ({ to, subject, html }: SendEmailParams) => {
+export const smtpEmailService = async ({ to, subject, html }: SendEmailInput) => {
   const info = await transporter.sendMail({
     from: `"ATELA" <${env.EMAIL_FROM}>`,
     to,

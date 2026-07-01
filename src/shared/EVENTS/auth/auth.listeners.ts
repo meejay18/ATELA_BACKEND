@@ -1,11 +1,11 @@
 import { logger } from '../../LOGGER'
 import { eventBus } from '../events-bus'
 import { AUTH_EVENTS } from './auth.events'
-import { sendEmail } from '../../EMAIL/email-service'
 import {
   registerWorkspaceTemplate,
   resendVerificationCodeTemplate,
 } from '../../EMAIL/templates/emailTemplates'
+import { smtpEmailService } from '../../EMAIL/smtp/smtpService'
 
 type WorkspaceCreatedEvent = {
   userId: string
@@ -20,7 +20,7 @@ type WorkspaceCreatedEvent = {
 export const registerAuthListeners = () => {
   eventBus.on(AUTH_EVENTS.WORKSPACE_CREATED, async (payload: WorkspaceCreatedEvent) => {
     try {
-      await sendEmail({
+      await smtpEmailService({
         to: payload.email,
         subject: 'Welcome To Atela',
         html: registerWorkspaceTemplate({
@@ -47,7 +47,7 @@ export const registerAuthListeners = () => {
 
   eventBus.on(AUTH_EVENTS.RESEND_VERIFICATION, async (payload) => {
     try {
-      await sendEmail({
+      await smtpEmailService({
         to: payload.email,
         subject: 'Verify Your Email',
         html: resendVerificationCodeTemplate({

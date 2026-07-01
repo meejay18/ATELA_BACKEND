@@ -16,6 +16,9 @@ const envSchema = z.object({
   SMTP_PORT: z.coerce.number(),
   SMTP_USER: z.string().email(),
   SMTP_PASS: z.string(),
+  RESEND_API_KEY: z.string(),
+  RESEND_EMAIL_FROM: z.string(),
+  EMAIL_PROVIDER: z.string(),
 })
 
 export const env = envSchema.parse(process.env)
